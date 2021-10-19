@@ -1,9 +1,12 @@
 package com.karumi.shot.android
 
 import com.karumi.shot.android.Adb.baseStoragePath
-import com.karumi.shot.domain.model.{AppId, Folder}
+import com.karumi.shot.domain.model.{AppId, FilePath, Folder}
 
+import java.io.File
+import scala.compat.Platform.EOL
 import scala.sys.process._
+import java.nio.file.Path
 
 object Adb {
   var adbBinaryPath: String = ""
@@ -23,7 +26,7 @@ class Adb {
 
   def devices: List[String] = {
     executeAdbCommandWithResult("devices")
-      .split('\n')
+      .split(EOL)
       .toList
       .drop(1)
       .map { line =>

@@ -2,6 +2,8 @@ package com.karumi.shot.domain
 
 import com.karumi.shot.domain.model.{FilePath, ScreenshotComparisionErrors, ScreenshotsSuite}
 
+import java.io.File
+
 object model {
   type ScreenshotsSuite            = Seq[Screenshot]
   type FilePath                    = String
@@ -22,25 +24,25 @@ object Config {
 
   def screenshotsFolderName(flavor: String, buildType: String): FilePath =
     if (flavor.isEmpty) {
-      s"/screenshots/$buildType/"
+      normalizedPath(s"/screenshots/$buildType/")
     } else {
-      s"/screenshots/$flavor/$buildType/"
+      normalizedPath(s"/screenshots/$flavor/$buildType/")
     }
 
   def pulledScreenshotsFolder(flavor: String, buildType: String): FilePath =
-    screenshotsFolderName(flavor, buildType) + "screenshots-default/"
+    normalizedPath(screenshotsFolderName(flavor, buildType) + "screenshots-default/")
 
   def pulledComposeScreenshotsFolder(flavor: String, buildType: String): FilePath =
-    screenshotsFolderName(flavor, buildType) + "screenshots-compose-default/"
+    normalizedPath(screenshotsFolderName(flavor, buildType) + "screenshots-compose-default/")
 
   def metadataFileName(flavor: String, buildType: String): FilePath =
-    pulledScreenshotsFolder(flavor, buildType) + "metadata.xml"
+    normalizedPath(pulledScreenshotsFolder(flavor, buildType) + "metadata.xml")
 
   def composeMetadataFileName(flavor: String, buildType: String): FilePath =
-    pulledComposeScreenshotsFolder(flavor, buildType) + "metadata.json"
+    normalizedPath(pulledComposeScreenshotsFolder(flavor, buildType) + "metadata.json")
 
   val androidPluginName: FilePath           = "com.android.application"
-  val screenshotsTemporalRootPath: FilePath = "/tmp/shot/screenshot/"
+  val screenshotsTemporalRootPath: FilePath = normalizedPath("/tmp/shot/screenshot/")
 
   def defaultInstrumentationTestTask(flavor: String, buildType: String): String =
     s"connected${flavor.capitalize}${buildType.capitalize}AndroidTest"
@@ -50,15 +52,20 @@ object Config {
 
   val defaultPackageTestApkTask: String = "packageDebugAndroidTest"
 
-  def reportFolder(flavor: String, buildType: String): String = "/reports/shot"
+  def reportFolder(flavor: String, buildType: String): String = normalizedPath("/reports/shot")
 
   def verificationReportFolder(flavor: String, buildType: String): String =
-    reportFolder(flavor, buildType) + "/verification"
+    normalizedPath(reportFolder(flavor, buildType) + "/verification")
 
   def recordingReportFolder(flavor: String, buildType: String): String =
-    reportFolder(flavor, buildType) + "/record"
+    normalizedPath(reportFolder(flavor, buildType) + "/record")
 
   val defaultTaskName: String = "executeScreenshotTests"
+
+
+  private def normalizedPath(path: FilePath): FilePath = {
+    path.replace("/", File.separator)
+  }
 }
 
 case class Screenshot(
